@@ -28,7 +28,7 @@ resource "aws_cloudwatch_log_metric_filter" "cis_filters" {
 
   name           = each.key
   pattern        = each.value
-  log_group_name = data.aws_cloudwatch_log_group.cloudtrail_logs.name
+  log_group_name = data.aws_cloudwatch_log_group.aws-cloudtrail-logs-490004656758-ablr.name
 
   metric_transformation {
     name      = each.key
