@@ -1,5 +1,5 @@
 # Reference existing CloudWatch Log Group (Management Events)
-data "aws_cloudwatch_log_group" "aws-cloudtrail-logs" {
+data "aws_cloudwatch_log_group" "cloudtrail_logs" {
   name = "aws-cloudtrail-logs-ablr"
 }
 
@@ -28,7 +28,7 @@ resource "aws_cloudwatch_log_metric_filter" "cis_filters" {
 
   name           = each.key
   pattern        = each.value
-  log_group_name = data.aws_cloudwatch_log_group.aws-cloudtrail-logs.name
+  log_group_name = data.aws_cloudwatch_log_group.cloudtrail_logs.name
 
   metric_transformation {
     name      = each.key
