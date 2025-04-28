@@ -1,6 +1,6 @@
 # Reference existing CloudWatch Log Group (Management Events)
 data "aws_cloudwatch_log_group" "cloudtrail_logs" {
-  name = "cloudtrail-logs-ablr"
+  name = "aws-cloudtrail-logs-490004656758-ablr"
 }
 
 # Create SNS topic for CIS alerts
