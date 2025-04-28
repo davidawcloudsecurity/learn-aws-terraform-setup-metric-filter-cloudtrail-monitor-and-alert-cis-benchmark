@@ -1,20 +1,15 @@
-# Define the CloudWatch Log Group for CloudTrail logs
-resource "aws_cloudwatch_log_group" "cloudtrail_logs_ablr" {
+# Reference existing CloudWatch Log Group (Management Events)
+data "aws_cloudwatch_log_group" "cloudtrail_logs" {
   name = "cloudtrail-logs-ablr"
 }
 
-# Define the CloudWatch Log Group for S3 data event logs
-resource "aws_cloudwatch_log_group" "s3_data_events" {
-  name = "s3-data-events"
-}
-
-# Define the SNS Topic for notifications
+# Create SNS topic for CIS alerts
 resource "aws_sns_topic" "cis_alerts" {
   name = "cis-alerts"
 }
 
-# CloudWatch Metric Filters for Management Events
-resource "aws_cloudwatch_log_metric_filter" "management_event_filters" {
+# CIS Benchmark: Metric Filters for Management Events
+resource "aws_cloudwatch_log_metric_filter" "cis_filters" {
   for_each = {
     "UnauthorizedAPICalls" = "{($.errorCode=\"*UnauthorizedOperation\") || ($.errorCode=\"AccessDenied*\")}"
     "RootAccountUsage"     = "{$.userIdentity.type=\"Root\" && $.userIdentity.invokedBy NOT EXISTS && $.eventType !=\"AwsServiceEvent\"}"
@@ -33,7 +28,7 @@ resource "aws_cloudwatch_log_metric_filter" "management_event_filters" {
 
   name           = each.key
   pattern        = each.value
-  log_group_name = aws_cloudwatch_log_group.cloudtrail_logs_ablr.name
+  log_group_name = data.aws_cloudwatch_log_group.cloudtrail_logs.name
 
   metric_transformation {
     name      = each.key
@@ -42,27 +37,9 @@ resource "aws_cloudwatch_log_metric_filter" "management_event_filters" {
   }
 }
 
-# CloudWatch Metric Filters for S3 Data Events
-resource "aws_cloudwatch_log_metric_filter" "s3_data_event_filters" {
-  for_each = {
-    "S3ObjectRead"  = "{($.eventSource=s3.amazonaws.com) && ($.eventName=GetObject)}"
-    "S3ObjectWrite" = "{($.eventSource=s3.amazonaws.com) && ($.eventName=PutObject)}"
-  }
-
-  name           = each.key
-  pattern        = each.value
-  log_group_name = aws_cloudwatch_log_group.s3_data_events.name
-
-  metric_transformation {
-    name      = each.key
-    namespace = "CISBenchmark"
-    value     = "1"
-  }
-}
-
-# CloudWatch Alarms for Management Events
-resource "aws_cloudwatch_metric_alarm" "management_event_alarms" {
-  for_each = aws_cloudwatch_log_metric_filter.management_event_filters
+# CloudWatch Alarms for each CIS metric filter
+resource "aws_cloudwatch_metric_alarm" "cis_alarms" {
+  for_each = aws_cloudwatch_log_metric_filter.cis_filters
 
   alarm_name          = "CIS-${each.key}-Alarm"
   comparison_operator = "GreaterThanOrEqualToThreshold"
@@ -72,12 +49,5 @@ resource "aws_cloudwatch_metric_alarm" "management_event_alarms" {
   period              = 300
   statistic           = "Sum"
   threshold           = 1
-
-  alarm_actions = [aws_sns_topic.cis_alerts.arn]
+  alarm_actions       = [aws_sns_topic.cis_alerts.arn]
 }
-
-# CloudWatch Alarms for S3 Data Events
-resource "aws_cloudwatch_metric_alarm" "s3_data_event_alarms" {
-  for_each =
-::contentReference[oaicite:0]{index=0}
- 
