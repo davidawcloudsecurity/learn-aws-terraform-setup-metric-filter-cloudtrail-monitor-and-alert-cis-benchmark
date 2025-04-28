@@ -1,6 +1,6 @@
 # Reference existing CloudWatch Log Group (Management Events)
-data "aws_cloudwatch_log_group" "aws-cloudtrail-logs-490004656758-ablr" {
-  name = "aws-cloudtrail-logs-490004656758-ablr"
+data "aws_cloudwatch_log_group" "aws-cloudtrail-logs-ablr" {
+  name = "aws-cloudtrail-logs-ablr"
 }
 
 # Create SNS topic for CIS alerts
@@ -28,7 +28,7 @@ resource "aws_cloudwatch_log_metric_filter" "cis_filters" {
 
   name           = each.key
   pattern        = each.value
-  log_group_name = data.aws_cloudwatch_log_group.aws-cloudtrail-logs-490004656758-ablr.name
+  log_group_name = data.aws_cloudwatch_log_group.aws-cloudtrail-logs-ablr.name
 
   metric_transformation {
     name      = each.key
