@@ -1,5 +1,5 @@
 # Reference existing CloudWatch Log Group (Management Events)
-data "aws_cloudwatch_log_group" "aws-cloudtrail-logs-ablr" {
+data "aws_cloudwatch_log_group" "aws-cloudtrail-logs" {
   name = "aws-cloudtrail-logs-ablr"
 }
 
